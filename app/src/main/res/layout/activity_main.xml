@@ -10,7 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/et1"
-        />
+        android:hint="Artist" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/et2"
+        android:hint="URL"
+        android:text="http://www.free-map.org.uk/course/mad/ws/hits.php" />
 
     <Button
         android:layout_width="wrap_content"

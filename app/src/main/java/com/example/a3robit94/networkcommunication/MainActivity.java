@@ -17,51 +17,50 @@ import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    class MyTask extends AsyncTask<String,Void,String>{
-        public String doInBackground(String... arguments){
-            HttpURLConnection conn = null;
+    class MyTask extends AsyncTask<String, Void, String> {
+        public String doInBackground(String... arguments) {
             String artist = arguments[0];
+            String url = arguments[1];
+            if (url == null || url.isEmpty() || artist == null || artist.isEmpty()) {
+                return "Error: A valid artist and url are required";
+            }
+            HttpURLConnection conn = null;
             try {
-                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/hits.php" + "?artist=" + artist);
-                conn = (HttpURLConnection) url.openConnection();
+                URL urlOBJ = new URL(url + "?artist=" + artist);
+                conn = (HttpURLConnection) urlOBJ.openConnection();
                 InputStream in = conn.getInputStream();
-                if(conn.getResponseCode() == 200){
+                if (conn.getResponseCode() == 200) {
                     BufferedReader br = new BufferedReader(new InputStreamReader(in));
                     String result = "", line;
-                    while((line = br.readLine()) !=null){
+                    while ((line = br.readLine()) != null) {
                         result += line;
                     }
                     return result;
-                }
-
-                else{
+                } else {
                     return "HTTP ERROR: " + conn.getResponseCode();
                 }
 
-            }
-            catch(IOException e){
+            } catch (IOException e) {
                 return e.toString();
-            }
-            finally{
-                if(conn!=null)
+            } finally {
+                if (conn != null)
                     conn.disconnect();
             }
 
         }
-        public void onPostExecute(String result){
-            TextView tv = (TextView)findViewById(R.id.tv1);
+
+        public void onPostExecute(String result) {
+            TextView tv = (TextView) findViewById(R.id.tv1);
             tv.setText(result);
         }
     }
-
-
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button go = (Button)findViewById(R.id.btn1);
+        Button go = (Button) findViewById(R.id.btn1);
         go.setOnClickListener(this);
     }
 
@@ -69,8 +68,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         EditText et = (EditText) findViewById(R.id.et1);
         String artist = et.getText().toString();
+        EditText et2 = (EditText) findViewById(R.id.et2);
+        String url = et2.getText().toString();
 
         MyTask myTask = new MyTask();
-        myTask.execute(artist);
+        myTask.execute(artist, url);
     }
 }
