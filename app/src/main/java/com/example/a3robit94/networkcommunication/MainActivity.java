@@ -20,8 +20,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     class MyTask extends AsyncTask<String,Void,String>{
         public String doInBackground(String... arguments){
             HttpURLConnection conn = null;
+            String artist = arguments[0];
             try {
-                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/hits.php?artist=");
+                URL url = new URL("http://www.free-map.org.uk/course/mad/ws/hits.php" + "?artist=" + artist);
                 conn = (HttpURLConnection) url.openConnection();
                 InputStream in = conn.getInputStream();
                 if(conn.getResponseCode() == 200){
@@ -66,7 +67,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        MyTask t = new MyTask();
-        t.execute();
+        EditText et = (EditText) findViewById(R.id.et1);
+        String artist = et.getText().toString();
+
+        MyTask myTask = new MyTask();
+        myTask.execute(artist);
     }
 }
