@@ -15,6 +15,10 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     class MyTask extends AsyncTask<String, Void, String> {
@@ -26,32 +30,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             HttpURLConnection conn = null;
             try {
-                URL urlOBJ = new URL(url + "?artist=" + artist);
+                URL urlOBJ = new URL(url + "?artist=" + artist + "&format=json");
                 conn = (HttpURLConnection) urlOBJ.openConnection();
                 InputStream in = conn.getInputStream();
                 if (conn.getResponseCode() == 200) {
                     BufferedReader br = new BufferedReader(new InputStreamReader(in));
                     String result = "", line;
-                    while ((line = br.readLine()) != null) {
+                    while ((line = br.readLine()) != null)
                         result += line;
+                    JSONArray jsonArr = new JSONArray(result);
+                    String text = "";
+
+                    for(int i=0; i<jsonArr.length(); i++) {
+                        JSONObject curObj = jsonArr.getJSONObject(i);
+                        String name = curObj.getString("name"), jartist = curObj.getString("artist");
+                        int year = curObj.getInt("year"), quantity = curObj.getInt("quantity");
+                        text += " Name=" + name + " Artist=" + jartist + " Year=" + year + " Quantity=" + quantity + "/n";
                     }
-                    return result;
-                } else {
+                    return text;
+                }
+                else {
                     return "HTTP ERROR: " + conn.getResponseCode();
                 }
 
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 return e.toString();
-            } finally {
+            }
+            catch(JSONException e){
+                return "Error";
+            }
+            finally {
                 if (conn != null)
                     conn.disconnect();
             }
 
         }
 
-        public void onPostExecute(String result) {
+
+
+        public void onPostExecute(String text) {
             TextView tv = (TextView) findViewById(R.id.tv1);
-            tv.setText(result);
+            tv.setText(text);
         }
     }
 
@@ -70,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String artist = et.getText().toString();
         EditText et2 = (EditText) findViewById(R.id.et2);
         String url = et2.getText().toString();
+
+
 
         MyTask myTask = new MyTask();
         myTask.execute(artist, url);
